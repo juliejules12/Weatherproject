@@ -19,3 +19,63 @@
 🔔 Rain alert!
 
 
+📍 City: New York
+🌡️ Temperature: 6.07°C (feels like 0.57°C)
+🔻 Min: 4.97°C | 🔹 Max: 7.37°C
+🌤️ Condition: Few clouds ☁️
+💧 Humidity: 35%
+🌬️ Wind Speed: 11.83 m/s
+🕒 Local Time: 2025-04-08 19:44:06
+🌍 Map: https://www.google.com/maps/search/New York
+
+
+📍 City: Tanzania
+🌡️ Temperature: 21.8°C (feels like 22.33°C)
+🔻 Min: 21.8°C | 🔹 Max: 21.8°C
+🌤️ Condition: Scattered clouds ☁️
+💧 Humidity: 88%
+🌬️ Wind Speed: 1.16 m/s
+🕒 Local Time: 2025-04-08 19:44:22
+🌍 Map: https://www.google.com/maps/search/Tanzania
+
+
+📍 City: Cape Town
+🌡️ Temperature: 19.52°C (feels like 19.88°C)
+🔻 Min: 18.95°C | 🔹 Max: 20.23°C
+🌤️ Condition: Broken clouds ☁️
+💧 Humidity: 90%
+🌬️ Wind Speed: 2.68 m/s
+🕒 Local Time: 2025-04-08 19:44:43
+🌍 Map: https://www.google.com/maps/search/Cape Town
+
+
+📍 City: Cape Town
+🌡️ Temperature: 19.52°C (feels like 19.88°C)
+🔻 Min: 18.95°C | 🔹 Max: 20.23°C
+🌤️ Condition: Broken clouds ☁️
+💧 Humidity: 90%
+🌬️ Wind Speed: 2.68 m/s
+🕒 Local Time: 2025-04-08 19:45:36
+🌍 Map: https://www.google.com/maps/search/Cape Town
+
+
+📍 City: Kingston
+🌡️ Temperature: 29.53°C (feels like 32.32°C)
+🔻 Min: 29.53°C | 🔹 Max: 30.09°C
+🌤️ Condition: Few clouds ☁️
+💧 Humidity: 62%
+🌬️ Wind Speed: 5.66 m/s
+🕒 Local Time: 2025-04-08 19:45:49
+🌍 Map: https://www.google.com/maps/search/Kingston
+
+
+📍 City: Qatar
+🌡️ Temperature: 29.66°C (feels like 28.91°C)
+🔻 Min: 29.66°C | 🔹 Max: 29.66°C
+🌤️ Condition: Clear sky ☀️
+💧 Humidity: 36%
+🌬️ Wind Speed: 5.58 m/s
+🕒 Local Time: 2025-04-08 19:53:17
+🌍 Map: https://www.google.com/maps/search/Qatar
+
+
