@@ -1,0 +1,21 @@
+📍 City: Kenya
+🌡️ Temperature: 29.98°C (feels like 30.16°C)
+🔻 Min: 29.98°C | 🔹 Max: 29.98°C
+🌤️ Condition: Overcast clouds ☁️
+💧 Humidity: 44%
+🌬️ Wind Speed: 5.76 m/s
+🕒 Local Time: 2025-04-08 19:25:42
+🌍 Map: https://www.google.com/maps/search/Kenya
+
+
+📍 City: Nairobi
+🌡️ Temperature: 22.62°C (feels like 22.5°C)
+🔻 Min: 22.62°C | 🔹 Max: 22.62°C
+🌤️ Condition: Light rain 🌧️
+💧 Humidity: 60%
+🌬️ Wind Speed: 5.66 m/s
+🕒 Local Time: 2025-04-08 19:25:55
+🌍 Map: https://www.google.com/maps/search/Nairobi
+🔔 Rain alert!
+
+
