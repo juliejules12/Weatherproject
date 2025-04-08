@@ -1,19 +1,13 @@
 import streamlit as st
 import requests
 import datetime
-import pyttsx3  # for sound feedback
 import geocoder
 import folium
 from streamlit_folium import st_folium
 import matplotlib.pyplot as plt
 
-# 🔑 Your API Key
 API_KEY = "6dcaaf81b52e225138f3932dc30c0af3"
 
-# 🎵 Initialize text-to-speech
-engine = pyttsx3.init()
-
-# 🎨 App Header
 st.set_page_config(page_title="JulesJulie Weather App", page_icon="⛅")
 st.markdown("<h1 style='text-align: center;'>🌤️ Weather App by <span style='color:#6c63ff;'>JulesJulie</span></h1>", unsafe_allow_html=True)
 
@@ -32,10 +26,6 @@ if city:
     res = requests.get(url)
     if res.status_code == 200:
         data = res.json()
-
-        # 🎵 Voice feedback
-        engine.say(f"Weather for {city} found!")
-        engine.runAndWait()
 
         weather = data["weather"][0]["description"].title()
         icon = data["weather"][0]["icon"]
@@ -67,7 +57,7 @@ if city:
             dates = []
             temps = []
 
-            for i in range(0, 40, 8):  # 5-day, every 24 hours (8 * 3h intervals)
+            for i in range(0, 40, 8):  # 5-day, every 24 hours
                 day = forecast_data["list"][i]
                 date = datetime.datetime.strptime(day["dt_txt"], "%Y-%m-%d %H:%M:%S").date()
                 dates.append(str(date))
@@ -80,6 +70,6 @@ if city:
             ax.set_ylabel("Temp (°C)")
             ax.set_title(f"Weekly Forecast for {city}")
             st.pyplot(fig)
-
     else:
         st.error("City not found 😞")
+
