@@ -1,62 +1,85 @@
 import streamlit as st
 import requests
+import datetime
+import pyttsx3  # for sound feedback
+import geocoder
+import folium
+from streamlit_folium import st_folium
+import matplotlib.pyplot as plt
 
-# Set page configuration
-st.set_page_config(page_title="Weather App", page_icon="⛅", layout="centered")
+# 🔑 Your API Key
+API_KEY = "6dcaaf81b52e225138f3932dc30c0af3"
 
-# Title
-st.markdown("<h1 style='text-align: center;'>⛅ Weather App</h1>", unsafe_allow_html=True)
+# 🎵 Initialize text-to-speech
+engine = pyttsx3.init()
 
-# Input field
-city = st.text_input("Enter a city name:")
+# 🎨 App Header
+st.set_page_config(page_title="JulesJulie Weather App", page_icon="⛅")
+st.markdown("<h1 style='text-align: center;'>🌤️ Weather App by <span style='color:#6c63ff;'>JulesJulie</span></h1>", unsafe_allow_html=True)
 
-# OpenWeatherMap API
-api_key = "6dcaaf81b52e225138f3932dc30c0af3"
-base_url = "https://api.openweathermap.org/data/2.5/weather"
+# 📍 Auto-detect location
+if st.button("📍 Use My Location"):
+    g = geocoder.ip('me')
+    if g.ok:
+        st.session_state.city = g.city
+    else:
+        st.error("Couldn't detect location.")
 
-# Weather emojis
-weather_emojis = {
-    "Clear": "☀️",
-    "Clouds": "☁️",
-    "Rain": "🌧️",
-    "Drizzle": "🌦️",
-    "Thunderstorm": "⛈️",
-    "Snow": "❄️",
-    "Mist": "🌫️",
-    "Fog": "🌫️",
-    "Haze": "🌁"
-}
+city = st.text_input("Enter a city name:", st.session_state.get("city", ""))
 
-# Fetch and display weather
 if city:
-    params = {
-        "q": city,
-        "appid": api_key,
-        "units": "metric"
-    }
-    response = requests.get(base_url, params=params)
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
+    res = requests.get(url)
+    if res.status_code == 200:
+        data = res.json()
 
-    if response.status_code == 200:
-        data = response.json()
-        weather_main = data["weather"][0]["main"]
-        weather_desc = data["weather"][0]["description"].title()
+        # 🎵 Voice feedback
+        engine.say(f"Weather for {city} found!")
+        engine.runAndWait()
+
+        weather = data["weather"][0]["description"].title()
+        icon = data["weather"][0]["icon"]
         temp = data["main"]["temp"]
         feels_like = data["main"]["feels_like"]
         humidity = data["main"]["humidity"]
         wind_speed = data["wind"]["speed"]
-        icon_code = data["weather"][0]["icon"]
-        icon_url = f"http://openweathermap.org/img/wn/{icon_code}@2x.png"
-        emoji = weather_emojis.get(weather_main, "🌈")
 
-        # Display result in columns
-        st.image(icon_url)
-        st.subheader(f"{emoji} {weather_desc}")
-        col1, col2 = st.columns(2)
-        col1.metric("Temperature", f"{temp}°C")
-        col2.metric("Feels Like", f"{feels_like}°C")
-        col1.metric("Humidity", f"{humidity}%")
-        col2.metric("Wind Speed", f"{wind_speed} m/s")
+        st.image(f"http://openweathermap.org/img/wn/{icon}@2x.png", width=100)
+        st.markdown(f"## 🌤️ {weather}")
+        st.markdown(f"**Temperature:** {temp}°C")
+        st.markdown(f"**Feels Like:** {feels_like}°C")
+        st.markdown(f"**Humidity:** {humidity}%")
+        st.markdown(f"**Wind Speed:** {wind_speed} m/s")
+
+        # 🗺️ City map preview
+        lat = data["coord"]["lat"]
+        lon = data["coord"]["lon"]
+        st.markdown("### 🗺️ City Map")
+        city_map = folium.Map(location=[lat, lon], zoom_start=10)
+        folium.Marker([lat, lon], popup=city).add_to(city_map)
+        st_folium(city_map, width=700)
+
+        # 📉 Weekly forecast
+        forecast_url = f"http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={API_KEY}&units=metric"
+        forecast_res = requests.get(forecast_url)
+        if forecast_res.status_code == 200:
+            forecast_data = forecast_res.json()
+            dates = []
+            temps = []
+
+            for i in range(0, 40, 8):  # 5-day, every 24 hours (8 * 3h intervals)
+                day = forecast_data["list"][i]
+                date = datetime.datetime.strptime(day["dt_txt"], "%Y-%m-%d %H:%M:%S").date()
+                dates.append(str(date))
+                temps.append(day["main"]["temp"])
+
+            st.markdown("### 📉 Weekly Forecast")
+            fig, ax = plt.subplots()
+            ax.plot(dates, temps, marker="o")
+            ax.set_xlabel("Date")
+            ax.set_ylabel("Temp (°C)")
+            ax.set_title(f"Weekly Forecast for {city}")
+            st.pyplot(fig)
 
     else:
-        st.error("City not found. Please enter a valid city name.")
-
+        st.error("City not found 😞")
