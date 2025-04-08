@@ -1,75 +1,87 @@
 import streamlit as st
 import requests
 import datetime
-import geocoder
-import folium
-from streamlit_folium import st_folium
-import matplotlib.pyplot as plt
+import pandas as pd
 
-API_KEY = "6dcaaf81b52e225138f3932dc30c0af3"
+st.set_page_config(page_title="Weather App", page_icon="🌤️")
+st.markdown("<h1 style='text-align: center;'>🌤️ Weather App</h1>", unsafe_allow_html=True)
+st.markdown("<h5 style='text-align: center;'>by julesjulie 💻</h5>", unsafe_allow_html=True)
+st.write(" ")
 
-st.set_page_config(page_title="JulesJulie Weather App", page_icon="⛅")
-st.markdown("<h1 style='text-align: center;'>🌤️ Weather App by <span style='color:#6c63ff;'>JulesJulie</span></h1>", unsafe_allow_html=True)
+api_key = "6dcaaf81b52e225138f3932dc30c0af3"
 
-# 📍 Auto-detect location
-if st.button("📍 Use My Location"):
-    g = geocoder.ip('me')
-    if g.ok:
-        st.session_state.city = g.city
-    else:
-        st.error("Couldn't detect location.")
+def get_current_location():
+    try:
+        ipinfo = requests.get("https://ipinfo.io/json").json()
+        return ipinfo.get("city", "Kingston")
+    except:
+        return "Kingston"
 
-city = st.text_input("Enter a city name:", st.session_state.get("city", ""))
+def get_weather(city):
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+    res = requests.get(url)
+    return res.json()
+
+def get_weekly_forecast(city):
+    url = f"https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={api_key}&units=metric"
+    return requests.get(url).json()
+
+city = st.text_input("📍 Enter a city name:", get_current_location())
 
 if city:
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
-    res = requests.get(url)
-    if res.status_code == 200:
-        data = res.json()
+    data = get_weather(city)
 
+    if data.get("cod") != 200:
+        st.error("City not found. Please try again.")
+    else:
         weather = data["weather"][0]["description"].title()
-        icon = data["weather"][0]["icon"]
         temp = data["main"]["temp"]
         feels_like = data["main"]["feels_like"]
         humidity = data["main"]["humidity"]
-        wind_speed = data["wind"]["speed"]
+        wind = data["wind"]["speed"]
+        icon = data["weather"][0]["icon"]
+        lat = data["coord"]["lat"]
+        lon = data["coord"]["lon"]
 
         st.image(f"http://openweathermap.org/img/wn/{icon}@2x.png", width=100)
         st.markdown(f"## 🌤️ {weather}")
-        st.markdown(f"**Temperature:** {temp}°C")
-        st.markdown(f"**Feels Like:** {feels_like}°C")
-        st.markdown(f"**Humidity:** {humidity}%")
-        st.markdown(f"**Wind Speed:** {wind_speed} m/s")
 
-        # 🗺️ City map preview
-        lat = data["coord"]["lat"]
-        lon = data["coord"]["lon"]
-        st.markdown("### 🗺️ City Map")
-        city_map = folium.Map(location=[lat, lon], zoom_start=10)
-        folium.Marker([lat, lon], popup=city).add_to(city_map)
-        st_folium(city_map, width=700)
+        sound_url = "https://www.soundjay.com/button/beep-07.wav"
+        st.markdown(
+            f"""
+            <audio autoplay>
+                <source src="{sound_url}" type="audio/wav">
+                Your browser does not support the audio element.
+            </audio>
+            """,
+            unsafe_allow_html=True
+        )
 
-        # 📉 Weekly forecast
-        forecast_url = f"http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={API_KEY}&units=metric"
-        forecast_res = requests.get(forecast_url)
-        if forecast_res.status_code == 200:
-            forecast_data = forecast_res.json()
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Temperature", f"{temp:.2f}°C")
+            st.metric("Humidity", f"{humidity}%")
+        with col2:
+            st.metric("Feels Like", f"{feels_like:.2f}°C")
+            st.metric("Wind Speed", f"{wind} m/s")
+
+        st.markdown("### 🗺️ Map Preview")
+        st.map(pd.DataFrame([[lat, lon]], columns=["lat", "lon"]))
+
+        forecast = get_weekly_forecast(city)
+        if "list" in forecast:
             dates = []
             temps = []
 
-            for i in range(0, 40, 8):  # 5-day, every 24 hours
-                day = forecast_data["list"][i]
-                date = datetime.datetime.strptime(day["dt_txt"], "%Y-%m-%d %H:%M:%S").date()
-                dates.append(str(date))
-                temps.append(day["main"]["temp"])
+            for entry in forecast["list"]:
+                dt = datetime.datetime.fromtimestamp(entry["dt"])
+                if dt.hour == 12:
+                    dates.append(dt.strftime("%a"))
+                    temps.append(entry["main"]["temp"])
 
-            st.markdown("### 📉 Weekly Forecast")
-            fig, ax = plt.subplots()
-            ax.plot(dates, temps, marker="o")
-            ax.set_xlabel("Date")
-            ax.set_ylabel("Temp (°C)")
-            ax.set_title(f"Weekly Forecast for {city}")
-            st.pyplot(fig)
-    else:
-        st.error("City not found 😞")
+            if dates and temps:
+                st.markdown("### 📉 Weekly Temperature Forecast")
+                df_chart = pd.DataFrame({"Day": dates, "Temp (°C)": temps})
+                st.line_chart(df_chart.set_index("Day"))
+
 
